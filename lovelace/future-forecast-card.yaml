@@ -35,7 +35,7 @@ yaxis:
             return ['Low','Med','High'][v] || '';
           }
 series:
-  - entity: sensor.peak_forecast_grid
+  - entity: sensor.peak_forecast_forecast_grid
     name: Probability
     type: column
     color_threshold:

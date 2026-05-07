@@ -7,9 +7,7 @@ title: Peak Level History
 hours_to_show: 168
 refresh_interval: 300
 entities:
-  - entity: sensor.peak_forecast_current_level
+  - entity: sensor.peak_forecast_current_peak_level
     name: Forecast level
-  - entity: binary_sensor.peak_forecast_active
+  - entity: binary_sensor.peak_forecast_peak_active
     name: Peak active
-  - entity: binary_sensor.peak_forecast_waiver_active
-    name: Waiver applied
