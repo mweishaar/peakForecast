@@ -1,0 +1,50 @@
+# Future Peak Forecast — column chart of probability per 30-min slot, 7 days out.
+# Reads the `slots` attribute on sensor.peak_forecast_grid.
+#
+# REQUIRES: custom:apexcharts-card  (install via HACS → Frontend → ApexCharts Card)
+#
+# Drop into Lovelace: Edit Dashboard → Add Card → Manual → paste this YAML.
+type: custom:apexcharts-card
+header:
+  show: true
+  title: 7-Day Peak Forecast
+  show_states: false
+graph_span: 7d
+span:
+  start: day
+apex_config:
+  chart:
+    height: 260
+  plotOptions:
+    bar:
+      columnWidth: 95%
+  legend:
+    show: false
+  tooltip:
+    x:
+      format: ddd MMM d, HH:mm
+yaxis:
+  - min: 0
+    max: 2
+    decimals: 0
+    apex_config:
+      tickAmount: 2
+      labels:
+        formatter: |
+          EVAL:function(v) {
+            return ['Low','Med','High'][v] || '';
+          }
+series:
+  - entity: sensor.peak_forecast_grid
+    name: Probability
+    type: column
+    color_threshold:
+      - value: 0
+        color: "#3fb950"
+      - value: 1
+        color: "#f0b400"
+      - value: 2
+        color: "#d44"
+    data_generator: |
+      const slots = entity.attributes.slots || [];
+      return slots.map(s => [new Date(s.start).getTime(), s.level]);

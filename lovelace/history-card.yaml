@@ -1,0 +1,15 @@
+# Historical peak level — built-in card, no HACS dependencies.
+# Shows the last 7 days of recorder-backed state changes.
+#
+# Drop into Lovelace: Edit Dashboard → Add Card → Manual → paste this YAML.
+type: history-graph
+title: Peak Level History
+hours_to_show: 168
+refresh_interval: 300
+entities:
+  - entity: sensor.peak_forecast_current_level
+    name: Forecast level
+  - entity: binary_sensor.peak_forecast_active
+    name: Peak active
+  - entity: binary_sensor.peak_forecast_waiver_active
+    name: Waiver applied

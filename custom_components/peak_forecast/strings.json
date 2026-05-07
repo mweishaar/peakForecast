@@ -1,0 +1,42 @@
+{
+  "config": {
+    "step": {
+      "user": {
+        "title": "Peak Forecast",
+        "description": "Capital Electric peak-forecast scraper. The default URL is correct for Capital Electric members; override only if you are using a different co-op page with the same grid markup.",
+        "data": {
+          "url": "Forecast page URL",
+          "scan_interval_minutes": "Poll interval (minutes)"
+        }
+      }
+    },
+    "abort": {
+      "single_instance_allowed": "Only one Peak Forecast integration can be configured."
+    }
+  },
+  "options": {
+    "step": {
+      "init": {
+        "title": "Peak Forecast options",
+        "data": {
+          "url": "Forecast page URL",
+          "scan_interval_minutes": "Poll interval (minutes)"
+        }
+      }
+    }
+  },
+  "entity": {
+    "sensor": {
+      "current_level": { "name": "Current peak level" },
+      "today_max": { "name": "Today's max level" },
+      "next_high_start": { "name": "Next high peak starts" },
+      "next_high_end": { "name": "Next high peak ends" },
+      "high_hours_today": { "name": "High peak hours today" },
+      "grid": { "name": "Forecast grid" }
+    },
+    "binary_sensor": {
+      "peak_active": { "name": "Peak active" },
+      "waiver_active": { "name": "Waiver active" }
+    }
+  }
+}
