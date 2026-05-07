@@ -61,8 +61,8 @@ Both are editable later under the integration's *Configure* button.
 | `sensor.peak_forecast_next_high_peak_ends` | timestamp | End of that contiguous window. |
 | `sensor.peak_forecast_high_peak_hours_today` | hours | Count of today's high-prob 30-min slots × 0.5. |
 | `sensor.peak_forecast_forecast_grid` | timestamp | State = last fetch time. **Attributes contain the full 224-slot grid** for chart cards. |
-| `binary_sensor.peak_forecast_peak_active` | binary | `on` when current slot is high. |
-| `binary_sensor.peak_forecast_waiver_active` | binary | `on` when current slot has a co-op waiver applied. |
+| `binary_sensor.peak_forecast_peak_active` | binary | `on` when the current slot is high probability. |
+| `binary_sensor.peak_forecast_waiver_active` | binary | `on` when Capital has issued a waiver for the current slot — i.e., the usual peak-shaving window is formally exempted today. Useful inverse signal: when this is `on`, you can skip pre-cool / coast-through logic. |
 
 (Entity IDs are auto-generated from translation keys; yours may differ slightly. Check Settings → Devices & Services → Peak Forecast.)
 
