@@ -25,7 +25,7 @@ A Home Assistant custom integration that scrapes the [Capital Electric Cooperati
 ### Option A — HACS (recommended)
 
 1. HACS → Integrations → ⋮ → **Custom repositories**.
-2. Add `https://github.com/markweishaar/peakForecast` as an *Integration*.
+2. Add `https://github.com/mweishaar/peakForecast` as an *Integration*.
 3. Install **Peak Forecast** from the list, then restart Home Assistant.
 4. Settings → Devices & Services → **Add Integration** → search for *Peak Forecast*.
 
