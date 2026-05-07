@@ -133,4 +133,4 @@ curl -s https://capitalelec.com/peak-forecast -o tests/fixtures/page-$(date +%Y-
 
 ## License
 
-MIT — see `LICENSE`.
+GPL-3.0-or-later — see `LICENSE`. Copyright © 2026 Mark Weishaar.

@@ -3,7 +3,7 @@ name = "peak-forecast-ha"
 version = "0.1.0"
 description = "Home Assistant custom integration for Capital Electric peak forecast"
 requires-python = ">=3.11"
-license = { text = "MIT" }
+license = { text = "GPL-3.0-or-later" }
 authors = [{ name = "Mark Weishaar" }]
 
 [project.optional-dependencies]
