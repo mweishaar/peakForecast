@@ -1,0 +1,164 @@
+alias: Adjust thermostats for peak forecast
+triggers:
+  - trigger: template
+    value_template: >
+      {% set t = states('sensor.peak_forecast_next_high_peak_starts') %} {{ t
+      not in ['unknown', 'unavailable', 'None', '']
+         and (as_timestamp(t) - as_timestamp(now())) | int < 3600
+         and (as_timestamp(t) - as_timestamp(now())) | int > 0 }}
+  - trigger: time_pattern
+    minutes: /5
+  - trigger: state
+    entity_id: binary_sensor.peak_forecast_peak_active
+    to: "on"
+  - trigger: state
+    entity_id: binary_sensor.peak_forecast_peak_active
+    to: "off"
+conditions: []
+actions:
+  - choose:
+      - conditions:
+          - condition: template
+            value_template: |
+              {{ trigger.platform in ['template', 'time_pattern'] }}
+          - condition: template
+            value_template: >
+              {% set t = states('sensor.peak_forecast_next_high_peak_starts') %}
+              {{ t not in ['unknown', 'unavailable', 'None', '']
+                 and (as_timestamp(t) - as_timestamp(now())) | int < 3600
+                 and (as_timestamp(t) - as_timestamp(now())) | int > 0 }}
+          - condition: state
+            entity_id: input_boolean.peak_pre_cool_active
+            state: "off"
+        sequence:
+          - action: input_boolean.turn_on
+            target:
+              entity_id: input_boolean.peak_pre_cool_active
+          - action: scene.create
+            data:
+              scene_id: pre_peak_climate
+              snapshot_entities:
+                - climate.upstairs_thermostat
+                - climate.downstairs_thermostat
+          - action: climate.set_temperature
+            continue_on_error: true
+            target:
+              entity_id: climate.upstairs_thermostat
+            data:
+              temperature: "{{ upstairs_base - (pre_cool_offset * upstairs_direction) }}"
+          - action: climate.set_temperature
+            continue_on_error: true
+            target:
+              entity_id: climate.downstairs_thermostat
+            data:
+              temperature: "{{ downstairs_base - (pre_cool_offset * downstairs_direction) }}"
+      - conditions:
+          - condition: template
+            value_template: >
+              {{ trigger.platform == 'state' and trigger.to_state.state == 'on'
+              }}
+          - condition: state
+            entity_id: input_boolean.peak_pre_cool_active
+            state: "on"
+        sequence:
+          - action: climate.set_temperature
+            continue_on_error: true
+            target:
+              entity_id: climate.upstairs_thermostat
+            data:
+              temperature: "{{ upstairs_base + (peak_offset * upstairs_direction) }}"
+          - action: climate.set_temperature
+            continue_on_error: true
+            target:
+              entity_id: climate.downstairs_thermostat
+            data:
+              temperature: "{{ downstairs_base + (peak_offset * downstairs_direction) }}"
+      - conditions:
+          - condition: template
+            value_template: >
+              {{ trigger.platform == 'state' and trigger.to_state.state == 'on'
+              }}
+          - condition: state
+            entity_id: input_boolean.peak_pre_cool_active
+            state: "off"
+        sequence:
+          - action: persistent_notification.create
+            data:
+              title: Peak Thermostat Automation — Peak Start Warning
+              message: >
+                Peak started but pre-cool never ran (sensor may have been
+                unavailable during the pre-cool window). Thermostats were NOT
+                adjusted. Please check and set manually.
+      - conditions:
+          - condition: template
+            value_template: >
+              {{ trigger.platform == 'state' and trigger.to_state.state == 'off'
+              }}
+          - condition: state
+            entity_id: input_boolean.peak_pre_cool_active
+            state: "on"
+        sequence:
+          - action: climate.set_temperature
+            continue_on_error: true
+            target:
+              entity_id: climate.upstairs_thermostat
+            data:
+              temperature: "{{ upstairs_base }}"
+          - action: climate.set_temperature
+            continue_on_error: true
+            target:
+              entity_id: climate.downstairs_thermostat
+            data:
+              temperature: "{{ downstairs_base }}"
+          - action: input_boolean.turn_off
+            target:
+              entity_id: input_boolean.peak_pre_cool_active
+      - conditions:
+          - condition: template
+            value_template: >
+              {{ trigger.platform == 'state' and trigger.to_state.state == 'off'
+              }}
+          - condition: state
+            entity_id: input_boolean.peak_pre_cool_active
+            state: "off"
+        sequence:
+          - action: persistent_notification.create
+            data:
+              title: Peak Thermostat Automation — Restore Failed
+              message: >
+                Peak ended but pre-cool never ran so there is nothing to
+                restore. Thermostats were NOT automatically adjusted. Please
+                check and adjust manually.
+    default:
+      - condition: template
+        value_template: |
+          {{ trigger.platform != 'time_pattern' }}
+      - action: persistent_notification.create
+        data:
+          title: Peak Thermostat Automation — Unmatched Trigger
+          message: >
+            Automation triggered but no branch matched. Trigger platform: {{
+            trigger.platform }}. {% if trigger.platform == 'state' %} to_state:
+            {{ trigger.to_state.state }}. {% endif %}
+variables:
+  upstairs_cool_base: 74
+  upstairs_heat_base: 71
+  downstairs_cool_base: 74
+  downstairs_heat_base: 71
+  pre_cool_offset: 3
+  peak_offset: 3
+  upstairs_direction: >
+    {% set mode = state_attr('climate.upstairs_thermostat', 'hvac_mode') %} {{
+    -1 if mode in ['heat'] else 1 }}
+  downstairs_direction: >
+    {% set mode = state_attr('climate.downstairs_thermostat', 'hvac_mode') %} {{
+    -1 if mode in ['heat'] else 1 }}
+  upstairs_base: |
+    {{ upstairs_heat_base if upstairs_direction == -1 else upstairs_cool_base }}
+  downstairs_base: >
+    {{ downstairs_heat_base if downstairs_direction == -1 else
+    downstairs_cool_base }}
+trace:
+  stored_traces: 50
+mode: single
+

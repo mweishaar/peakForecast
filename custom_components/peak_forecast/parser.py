@@ -78,7 +78,7 @@ def parse_html(
     """Parse forecast HTML; raise ForecastParseError if the grid is missing/empty."""
     tz = source_tz or ZoneInfo(SOURCE_TIMEZONE)
     soup = BeautifulSoup(html, "html.parser")
-    cells = soup.select("div.grid-cell[data-date][data-period]")
+    cells = soup.select("div.forecast-cell[data-date][data-period]")
     if not cells:
         raise ForecastParseError("no forecast cells found in page")
 
